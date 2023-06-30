@@ -1,0 +1,18 @@
+
+<!-- swap with angular material, mat-table -->
+<table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Holes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let course of courses" (click)="goToCourse(course)">
+        <td>{{ course.id }}</td>
+        <td>{{ course.name }}</td>
+        <td>{{ course.holes.length }}</td>
+      </tr>
+    </tbody>
+  </table>

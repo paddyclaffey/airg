@@ -1,0 +1,19 @@
+<!-- swap with angular material, mat-table -->
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Total</th>
+            <th>Score</th>
+            <th>Thru</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let player of players">
+            <td>{{ player.player_id }}</td>
+            <td>{{ player.total }}</td>
+            <td>{{ player.score }}</td>
+            <td>{{ player.thru }}</td>
+        </tr>
+    </tbody>
+</table>
