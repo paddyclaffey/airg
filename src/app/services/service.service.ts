@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ICourse, ICourseResponse, ICoursesResponse, IEvent, ILeaderboard, ILeaderboardResponse } from '../models/golf';
-import { map, take } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 
 @Injectable()
 export class ServiceService {
@@ -31,33 +31,28 @@ export class ServiceService {
 
   getLeaderBoard(event_id: number): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', this.authorizationToken);
-    return this.http.get<ILeaderboardResponse>(`${this.url}events/${event_id}/leaderboard/`, { headers }).pipe(map( response => {
-      // const data = response.data;
-      // const requests = [];
-      // data.forEach( player => {
-      //   requests.push(this.getPlayerInfo(event_id, player.player_id));
-      // });
-    
-      // // call these, combinelatest txjs func
-      // // on results, enhance the data on the original response
-      // // return of(data)
-      // return combineLatest(requests).pipe(take(1)).subscribe(allPlayersInfo => {
-      //   console.log(allPlayersInfo);
-
-      //   return data;
-      // });
-      return response.data;
-    })); 
+    return this.http.get<ILeaderboardResponse>(`${this.url}events/${event_id}/leaderboard/`, { headers }).pipe(
+      map(res => res.data),
+      switchMap(players => {
+        const playerInfoObservables = players.map(player => this.getPlayerInfo(event_id, player.player_id));
+        return forkJoin(playerInfoObservables).pipe(
+          map(playerInfo => {
+            // Enrich original list with player information
+            return players.map((player, index) => ({
+              ...player,
+              info: playerInfo[index]
+            }));
+          })
+        );
+      })
+    );
   }
 
   private getPlayerInfo(eventId_number, player_id: number): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', this.authorizationToken);
     
-    return this.http.get<any>(`${this.url}events/${eventId_number}/player/${player_id}/`, { headers }).pipe(map( response => response.data));
+    return this.http.get<any>(`${this.url}players/${player_id}/`, { headers }).pipe(map( response => response.data));
   }
-  // getLeaderBoard(event_id: number): Observable<ICourse[]> {
-  //   const headers = new HttpHeaders().set('Authorization', this.authorizationToken);
-  //   return this.http.get<ICourse[]>(`${this.url}events/${event_id}/leaderboard`, { headers });
-  // }
-
 }
+
+

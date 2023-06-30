@@ -3,6 +3,7 @@
     <thead>
         <tr>
             <th>ID</th>
+            <th>Name</th>
             <th>Total</th>
             <th>Score</th>
             <th>Thru</th>
@@ -11,6 +12,7 @@
     <tbody>
         <tr *ngFor="let player of players">
             <td>{{ player.player_id }}</td>
+            <td>{{ player.info.first_name }} {{ player.info.last_name  }}</td>
             <td>{{ player.total }}</td>
             <td>{{ player.score }}</td>
             <td>{{ player.thru }}</td>
